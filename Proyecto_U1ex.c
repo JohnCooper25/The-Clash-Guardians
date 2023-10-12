@@ -89,10 +89,167 @@ void agregarCarta(struct NodoCarta** tablero, struct NodoCarta* carta) {
     }
 }
 
+void jugarCarta(struct NodoCarta** mano_Jugador, struct NodoCarta** tablero) {
+    if (*mano_Jugador == NULL) {
+        printf("No tienes cartas en la mano para jugar.\n");
+        return;
+    }
+
+    printf("\nElige una carta para jugar:\n");
+    int i = 1;
+    struct NodoCarta* iterador_mano_jugador = *mano_Jugador;
+    while (iterador_mano_jugador != NULL) {
+        printf("%d. ", i);
+        mostrarCarta(iterador_mano_jugador->carta);
+        iterador_mano_jugador = iterador_mano_jugador->siguiente;
+        i++;
+    }
+
+    int eleccion;
+    printf("Elige el número de la carta que deseas jugar (1-%d): ", i - 1);
+    scanf("%d", &eleccion);
+
+    if (eleccion < 1 || eleccion >= i) {
+        printf("Selección no válida. Inténtalo de nuevo.\n");
+        return;
+    }
+
+    struct NodoCarta* carta_a_jugar = *mano_Jugador;
+    struct NodoCarta* carta_anterior = NULL;
+
+    // Encuentra la carta seleccionada en la lista de mano del jugador
+    for (int j = 1; j < eleccion; j++) {
+        carta_anterior = carta_a_jugar;
+        carta_a_jugar = carta_a_jugar->siguiente;
+    }
+
+    // Muestra la carta que se va a jugar
+    /*printf("Has jugado la siguiente carta:\n");
+    mostrarCarta(carta_a_jugar->carta);*/
+
+    // Elimina la carta de la mano del jugador
+    if (carta_anterior != NULL) {
+        carta_anterior->siguiente = carta_a_jugar->siguiente;
+    } else {
+        *mano_Jugador = carta_a_jugar->siguiente;
+    }
+
+    // Agrega la carta al tablero
+    carta_a_jugar->siguiente = *tablero;
+    *tablero = carta_a_jugar;
+
+    printf("La carta se ha jugado con exito.\n");
+}
+
+int contarCartas(struct NodoCarta* lista) {
+    int contador = 0;
+    struct NodoCarta* iterador = lista;
+
+    while (iterador != NULL) {
+        contador++;
+        iterador = iterador->siguiente;
+    }
+
+    return contador;
+}
+
+void turnoJugador(struct NodoCarta** mano_Jugador, struct NodoCarta** tablero) {
+    printf("\n----- Turno del Jugador -----\n");
+    printf("Tus cartas en mano:\n");
+    /*struct NodoCarta* iterador_mano_jugador = *mano_Jugador;
+    while (iterador_mano_jugador != NULL) {
+        mostrarCarta(iterador_mano_jugador->carta);
+        iterador_mano_jugador = iterador_mano_jugador->siguiente;
+    }*/
+
+    // Opciones para el jugador
+    int opcion;
+    printf("Elige una opción:\n");
+    printf("1. Jugar una carta\n");
+    printf("2. Terminar el turno\n");
+    scanf("%d", &opcion);
+
+    switch (opcion) {
+        case 1:
+            jugarCarta(mano_Jugador, tablero);
+            break;
+        case 2:
+            printf("Terminas tu turno.\n");
+            break;
+        default:
+            printf("Opción no válida.\n");
+            break;
+    }
+}
+
+// Función para el turno de la IA (selecciona una carta aleatoriamente)
+void turnoIA(struct NodoCarta** mano_IA, struct NodoCarta** tablero) {
+    if (*mano_IA == NULL) {
+        printf("\nLa IA no tiene cartas en la mano para jugar.\n");
+        return;
+    }
+
+    // Seleccionar una carta aleatoriamente
+    int num_cartas_mano_IA = contarCartas(*mano_IA);
+    int carta_seleccionada = rand() % num_cartas_mano_IA + 1;
+
+    struct NodoCarta* carta_a_jugar = *mano_IA;
+    struct NodoCarta* carta_anterior = NULL;
+
+    for (int i = 1; i < carta_seleccionada; i++) {
+        carta_anterior = carta_a_jugar;
+        carta_a_jugar = carta_a_jugar->siguiente;
+    }
+
+    // Muestra la carta que se va a jugar
+    /*printf("\nLa IA ha jugado la siguiente carta:\n");
+    mostrarCarta(carta_a_jugar->carta);*/
+
+    // Elimina la carta de la mano de la IA
+    if (carta_anterior != NULL) {
+        carta_anterior->siguiente = carta_a_jugar->siguiente;
+    } else {
+        *mano_IA = carta_a_jugar->siguiente;
+    }
+
+    // Agrega la carta al tablero
+    carta_a_jugar->siguiente = *tablero;
+    *tablero = carta_a_jugar;
+
+    printf("La IA ha jugado su carta.\n");
+}
+
+void mostrarDetalleTurno(struct NodoCarta* tablero, const char* nombreJugador, int vidaJugador, const char* nombreIA, int vidaIA) {
+    printf("\nDetalle del turno:\n");
+
+    struct NodoCarta* iterador = tablero;
+    int jugador = 1; // Variable para alternar entre el jugador y la IA
+
+    while (iterador != NULL) {
+        if (jugador) {
+            printf("Carta jugada por %s:\n", nombreJugador);
+            mostrarCarta(iterador->carta);
+        } else {
+            printf("Carta jugada por %s:\n", nombreIA);
+            mostrarCarta(iterador->carta);
+        }
+
+        jugador = !jugador; // Cambia entre jugador e IA en cada iteración
+        iterador = iterador->siguiente;
+    }
+
+    // Muestra la vida del jugador y la IA
+    printf("Vida de %s: %d\n", nombreJugador, vidaJugador);
+    printf("Vida de %s: %d\n", nombreIA, vidaIA);
+
+    // Puedes agregar aquí más detalles, como las acciones realizadas por el jugador o la IA
+}
+
 //***************JUEGO COMPLETO**********************
 void juego(struct NodoCarta* listaCartas) {
     struct NodoCarta* mazo_jugador = NULL;
     struct NodoCarta* mazo_ia = NULL;
+    struct NodoCarta* tablero = NULL;
 
     // Llenar mazo del jugador con las primeras 15 cartas de listaCartas
     for (int i = 0; i < 15 && listaCartas != NULL; i++) {
@@ -150,18 +307,21 @@ void juego(struct NodoCarta* listaCartas) {
 	        free(temp);
 	    }
 	}
+	
+	while (jugador.vida > 0 && ia.vida > 0) {
+        // Turno del jugador
+        turnoJugador(&mano_Jugador, &tablero);
+        
 
-    // Mostrar los datos de ambas manos
-    printf("\nMano del Jugador:\n");
-    struct NodoCarta* iterador_mano_jugador = mano_Jugador;
-    while (iterador_mano_jugador != NULL) {
-        mostrarCarta(iterador_mano_jugador->carta);
-        iterador_mano_jugador = iterador_mano_jugador->siguiente;
+        // Turno de la IA
+        turnoIA(&mano_IA, &tablero);
+        mostrarDetalleTurno(tablero, "IA", ia.vida, "Jugador", jugador.vida);
+        // A continuación, puedes implementar la lógica del combate entre las cartas
+        // jugadas por el jugador e IA, actualizar la vida de los jugadores, etc.
+
+        // ... (resto de la lógica del juego) ...
     }
 
-    // Mostrar la vida de ambos jugadores
-    printf("\nVida del Jugador: %d\n", jugador.vida);
-    printf("Vida de la IA: %d\n", ia.vida);
 }
 
 //*******Verificacion de tipo de carta*********
