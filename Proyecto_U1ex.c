@@ -49,6 +49,24 @@ struct NodoCarta* pop(struct Pila *pila) {
     return temp;
 }
 
+struct NodoCarta* seleccionarMejorCarta(struct Pila *tablero) {
+    struct NodoCarta* temp = tablero->tope;
+    struct NodoCarta* mejorCarta = temp;
+    int maxLP = temp->carta.LP - temp->carta.DF;
+    temp = temp->siguiente;
+
+    while (temp != NULL) {
+        int LP = temp->carta.LP - temp->carta.DF;
+        if (LP > maxLP) {
+            maxLP = LP;
+            mejorCarta = temp;
+        }
+        temp = temp->siguiente;
+    }
+
+    return mejorCarta;
+}
+
 // Funcion para inicializar una pila
 void inicializarPila(struct Pila *pila) {
     pila->tope = NULL;
@@ -78,6 +96,31 @@ void push(struct Pila *pila, struct NodoCarta* carta) {
     }
 
     pila->tamano++;
+}
+
+void atacarConCartaIA(struct Pila *tableroIA, struct Pila *tableroJugador, struct Jugador *jugador) {
+    // Seleccionar la mejor carta para atacar
+    struct NodoCarta* atacante = seleccionarMejorCarta(tableroIA);
+
+    // Seleccionar la mejor carta para atacar en el tablero del jugador
+    struct NodoCarta* atacado = seleccionarMejorCarta(tableroJugador);
+
+    // Realizar cálculos de ataque
+    int damage = atacante->carta.AP - atacado->carta.DF;
+    if (damage > 0) {
+        atacado->carta.LP -= damage;
+        if (atacado->carta.LP <= 0) {
+            // Eliminar la carta atacada del tablero del jugador y restarle un punto de vida al jugador
+            pop(tableroJugador);
+            jugador->vida--;
+            printf("Una de tus cartas ha sido derrotada.\n");
+        } else {
+            printf("Tu carta ha recibido %d puntos de danio.\n", damage);
+            printf("Vida restante de la carta atacada: %d\n", atacado->carta.LP);
+        }
+    } else {
+        printf("La carta atacada ha bloqueado todo el daño.\n");
+    }
 }
 
 
@@ -127,13 +170,14 @@ int obtenerNumeroAleatorio(int min, int max) {
     return rand() % (max - min + 1) + min;
 }
 
-void moverCartas(struct Pila *origen, struct Pila *destino, int n) {
+
+void moverCartas(struct Pila* origen, struct Pila* destino, int n) {
     for (int i = 0; i < n; i++) {
         struct NodoCarta* carta = pop(origen);
         if (carta != NULL) {
             push(destino, carta);
         } else {
-            printf("No se pueden mover mas cartas. La pila de origen esta vacia.\n");
+            printf("No se pueden mover más cartas. La pila de origen está vacía.\n");
             break;
         }
     }
@@ -239,11 +283,11 @@ void atacarConCarta(struct Pila *tableroJugador, struct Pila *tableroIA, struct 
             ia->vida--;
             printf("La carta de la IA ha sido derrotada.\n");
         } else {
-            printf("La carta de la IA ha recibido %d puntos de dano.\n", damage);
+            printf("La carta de la IA ha recibido %d puntos de danio.\n", damage);
             printf("Vida restante de la carta atacada: %d\n", atacado->carta.LP);
         }
     } else {
-        printf("La carta atacada ha bloqueado todo el dano.\n");
+        printf("La carta atacada ha bloqueado todo el danio.\n");
     }
 
     // Actualizar las estadisticas de las cartas si es necesario
@@ -360,6 +404,19 @@ void mostrarResumenTurno(struct Pila *tableroJugador, struct Pila *tableroIA, st
     }
 }
 
+void turno_IA(struct Pila* Mano_IA, struct Pila* Tablero_IA, struct Pila* Tablero_Jugador, struct Jugador* jugador) {
+    if (Tablero_IA->tamano == 0) {
+        jugarCartaIA(Mano_IA, Tablero_IA);
+    } else {
+        int decision = obtenerNumeroAleatorio(1, 3); // Ajuste de la probabilidad para atacar
+        if (decision == 1 || decision == 2) {
+            jugarCartaIA(Mano_IA, Tablero_IA);
+        } else {
+            atacarConCartaIA(Tablero_IA, Tablero_Jugador, jugador);
+        }
+    }
+}
+
 //***************JUEGO COMPLETO**********************
 void juego(struct NodoCarta* listaCartas) {
 	
@@ -448,29 +505,42 @@ void juego(struct NodoCarta* listaCartas) {
             switch (opcion) {
                 case 1:
                     jugarCarta(&Mano_Jugador, &Tablero_Jugador);
-                    jugarCartaIA(&Mano_IA, &Tablero_IA);
-                    mostrarResumenTurno(&Tablero_Jugador, &Tablero_IA, &jugador, &ia);
-                    turno++;
+                    /*jugarCartaIA(&Mano_IA, &Tablero_IA);
+                    mostrarResumenTurno(&Tablero_Jugador, &Tablero_IA, &jugador, &ia);*/
+                    //turno++;
                     break;
                 case 2:
                     if (Tablero_Jugador.tamano > 0) {
                         atacarConCarta(&Tablero_Jugador, &Tablero_IA, &ia);
-                        jugarCartaIA(&Mano_IA, &Tablero_IA);
-                        mostrarResumenTurno(&Tablero_Jugador, &Tablero_IA, &jugador, &ia);
+                        /*atacarConCartaIA(&Tablero_IA, &Tablero_Jugador, &jugador); // Llamado a la función atacarConCartaIA
+                        mostrarResumenTurno(&Tablero_Jugador, &Tablero_IA, &jugador, &ia);*/
                     } else {
                         printf("Necesitas al menos una carta en tu tablero para atacar.\n");
                     }
-                    turno++;
+                    //turno++;
                     break;
                 default:
                     printf("Opcion no valida.\n");
                     break;
-            }		
+            }
+            turno_IA(&Mano_IA, &Tablero_IA, &Tablero_Jugador, &jugador);
+            mostrarResumenTurno(&Tablero_Jugador, &Tablero_IA, &jugador, &ia);
+			turno++;		
+		}
+		
+		if(jugador.vida >0 && ia.vida<=0)
+		{
+			printf("\nDuelo Terminado.");
+			printf("\n%s, es el ganador.",jugador.Nombre);
+		}
+		
+		if(ia.vida>0 && jugador.vida<=0)
+		{
+			printf("\nDuelo Terminado.");
+			printf("\nLa IA es la ganadora.");
 		}
     	    
 	}
-		
-		
 		
 	}
 	    
@@ -504,12 +574,27 @@ void CrearCarta(struct NodoCarta** listaCartas) {
     
     printf("Ingresa el valor de LP de la carta: ");
     scanf("%d", &nuevoNodo->carta.LP);
+    if(nuevoNodo->carta.LP>150)
+    {
+    	printf("El valor es mas alto de lo que se acepta (150). favor reingresar:\n");
+    	scanf("%d", &nuevoNodo->carta.LP);
+	}
     
     printf("Ingresa el valor de AP de la carta: ");
     scanf("%d", &nuevoNodo->carta.AP);
+    if(nuevoNodo->carta.AP>130)
+    {
+    	printf("El valor es mas alto de lo que se acepta (130). favor reingresar:\n");
+    	scanf("%d", &nuevoNodo->carta.AP);
+	}
     
     printf("Ingresa el valor de DF de la carta: ");
     scanf("%d", &nuevoNodo->carta.DF);
+    if(nuevoNodo->carta.DF>110)
+    {
+    	printf("El valor es mas alto de lo que se acepta (110). favor reingresar:\n");
+    	scanf("%d", &nuevoNodo->carta.DF);
+	}
     
     nuevoNodo->siguiente = NULL;
     
