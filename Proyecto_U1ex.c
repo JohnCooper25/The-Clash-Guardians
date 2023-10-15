@@ -50,8 +50,7 @@ struct NodoCarta* pop(struct Pila *pila) {
 }
 //**********Fin de declaracion PILAS**********
 
-//********Algoritmo para mejor competitividad de la IA***********
-
+//********Algoritmo para mejor competitividad de la IA**********
 struct NodoCarta* seleccionarMejorCarta(struct Pila *tablero) {
     struct NodoCarta* temp = tablero->tope;
     struct NodoCarta* mejorCarta = temp;
@@ -81,13 +80,13 @@ void liberarMemoria(struct NodoCarta *listaCartas) {
     }
 }
 
-// Funcion para inicializar una pila
+// ********Inicializacion de Pila*********
 void inicializarPila(struct Pila *pila) {
     pila->tope = NULL;
     pila->tamano = 0;
 }
 
-// Funcion para agregar un elemento a la pila
+//**************Funcion PUSH*************
 void push(struct Pila *pila, struct NodoCarta* carta) {
     if (pila == NULL) {
         printf("La pila no esta inicializada.\n");
@@ -114,7 +113,6 @@ void push(struct Pila *pila, struct NodoCarta* carta) {
 
 
 //**********Funcion a cargo de correcto funcionamiento de los tableros*************
-
 void insertarEnTablero(struct Pila *tablero, struct Carta carta) {
     struct NodoCarta* nuevoNodo = (struct NodoCarta*)malloc(sizeof(struct NodoCarta));
     nuevoNodo->carta = carta;
@@ -152,11 +150,11 @@ void atacarConCartaIA(struct Pila *tableroIA, struct Pila *tableroJugador, struc
             printf("Tu carta ha sido derrotada.\n");
             jugador->vida -=1;
         } else {
-            printf("Tu carta ha recibido %d puntos de daño.\n", damage);
+            printf("Tu carta ha recibido %d puntos de danio.\n", damage);
             printf("Vida restante de tu carta: %d\n", atacado->carta.LP);
         }
     } else {
-        printf("Tu carta ha bloqueado todo el daño.\n");
+        printf("Tu carta ha bloqueado todo el danio.\n");
     }
 }
 
@@ -201,24 +199,24 @@ void cargaInformacion(struct NodoCarta** listaCartas) {
     fclose(file);
 }
 
-// Funcion para obtener un numero aleatorio entre min y max
+//**********Funcion para RANDS********
 int obtenerNumeroAleatorio(int min, int max) {
     return rand() % (max - min + 1) + min;
 }
 
+//*********Verifica Duplicados en Mano************
 bool cartaEnMazo(struct NodoCarta *carta, struct Pila *mazo) {
     struct NodoCarta* temp = mazo->tope;
     while (temp != NULL) {
         if (strcmp(temp->carta.Nombre, carta->carta.Nombre) == 0) {
-            return true; // La carta ya está en el mazo
+            return true; 
         }
         temp = temp->siguiente;
     }
-    return false; // La carta no está en el mazo
+    return false; 
 }
 
 //*************Movimiento correcto de las cartas entre las PILAS**************
-
 void moverCartas(struct Pila* origen, struct Pila* destino, int n) {
     for (int i = 0; i < n; i++) {
         struct NodoCarta* carta = pop(origen);
@@ -251,6 +249,7 @@ void mostrarCartasMano(struct Pila *mano) {
     }
 }
 
+//*********Funcion para mejorar la seleccion de posicion para el ataque*************
 struct NodoCarta* encontrarCartaEnPosicion(struct Pila *tablero, int posicion) {
     if (posicion < 1 || posicion > tablero->tamano) {
         return NULL;
@@ -266,6 +265,7 @@ struct NodoCarta* encontrarCartaEnPosicion(struct Pila *tablero, int posicion) {
     return temp;
 }
 
+//***********Elimina la carta en una posicion determinada*************
 void eliminarCartaEnPosicion(struct Pila *tablero, int posicion) {
     if (tablero->tope == NULL) {
         return; // No hay cartas en el tablero
@@ -351,16 +351,10 @@ void atacarConCarta(struct Pila *tableroJugador, struct Pila *tableroIA, struct 
     
     struct NodoCarta* atacado = encontrarCartaEnPosicion(tableroIA, atacadoIndex);
     if (atacado == NULL) {
-        printf("La carta atacada no se encuentra en la posición especificada.\n");
+        printf("La carta atacada no se encuentra en la posicion especificada.\n");
         return;
     }
     
-    /*struct NodoCarta* atacado = tableroIA->tope;
-    count = 1;
-    while (atacado != NULL && count < atacadoIndex) {
-        atacado = atacado->siguiente;
-        count++;
-    }*/
 
     if (atacante == NULL || atacado == NULL) {
         printf("No se encontro la carta seleccionada.\n");
@@ -391,14 +385,13 @@ void atacarConCarta(struct Pila *tableroJugador, struct Pila *tableroIA, struct 
 }
 
 //****************Opcion de jugar Carta JUGADOR*************************
-
 void jugarCarta(struct Pila *mano, struct Pila *tablero) {
     if (mano->tamano == 0) {
         printf("No hay cartas en tu mano. No se puede jugar ninguna carta.\n");
         return;
     }
 
-    // Mostrar todas las cartas en la mano con su índice correspondiente
+    // Mostrar todas las cartas en la mano con su indice correspondiente
     printf("Selecciona el numero de carta que deseas jugar (1-%d): \n", mano->tamano);
     struct NodoCarta* temp = mano->tope;
     int count = 1;
@@ -444,7 +437,6 @@ void jugarCarta(struct Pila *mano, struct Pila *tablero) {
     printf("Carta jugada con exito.\n");
 }
 
-
 //************Opcion de jugar carta IA***************
 void jugarCartaIA(struct Pila *mano, struct Pila *tablero) {
     int manoSize = mano->tamano;
@@ -481,6 +473,19 @@ void jugarCartaIA(struct Pila *mano, struct Pila *tablero) {
     insertarEnTablero(tablero, temp->carta);
 
     printf("La IA ha jugado una carta al tablero.\n");
+}
+
+//*******Escritura de Historial*******
+void escribirHistorial(struct Historial historial[], int *n, const char* resena) {
+    if (*n < 20) {
+        strcpy(historial[*n].resena, resena);
+        (*n)++;
+    } else {
+        for (int i = 1; i < 20; i++) {
+            strcpy(historial[i - 1].resena, historial[i].resena);
+        }
+        strcpy(historial[19].resena, resena);
+    }
 }
 
 //**********Resumen de los turnos**************
@@ -539,7 +544,7 @@ void juego(struct NodoCarta* listaCartas) {
     jugador.vida = 5;
     ia.vida = 5;
     int turno = 1;
-	
+    
     struct Pila Mazo_Jugador, Mazo_IA, Mano_Jugador, Mano_IA, Tablero_Jugador, Tablero_IA;
     
     // Inicializar las pilas
@@ -554,7 +559,8 @@ void juego(struct NodoCarta* listaCartas) {
     struct NodoCarta* iterador = listaCartas;
     int i;
     srand(time(0)); // Inicializar la semilla para obtener valores aleatorios
-
+	
+	
     for (i = 0; i < 15; i++) {
 	    // Obtener un numero aleatorio para seleccionar una carta
 	    int randomIndex = obtenerNumeroAleatorio(0, 59);
@@ -574,8 +580,6 @@ void juego(struct NodoCarta* listaCartas) {
 	    }
 	}
 	
-	
-	
 	//entregamos 3 cartas a las manos
 	moverCartas(&Mazo_Jugador, &Mano_Jugador, 3);
 	moverCartas(&Mazo_IA, &Mano_IA, 3);
@@ -589,6 +593,8 @@ void juego(struct NodoCarta* listaCartas) {
 		jugarCartaIA(&Mano_IA, &Tablero_IA);
 		
 		mostrarResumenTurno(&Tablero_Jugador, &Tablero_IA, &jugador, &ia);
+		
+		
 		
 		turno++;
 		
@@ -615,33 +621,33 @@ void juego(struct NodoCarta* listaCartas) {
             switch (opcion) {
                 case 1:
                     jugarCarta(&Mano_Jugador, &Tablero_Jugador);
-                    /*jugarCartaIA(&Mano_IA, &Tablero_IA);
-                    mostrarResumenTurno(&Tablero_Jugador, &Tablero_IA, &jugador, &ia);*/
-                    //turno++;
+                    
+                    
                     break;
                 case 2:
                     if (Tablero_Jugador.tamano > 0) {
-                        atacarConCarta(&Tablero_Jugador, &Tablero_IA, &ia);
-                        /*atacarConCartaIA(&Tablero_IA, &Tablero_Jugador, &jugador); // Llamado a la función atacarConCartaIA
-                        mostrarResumenTurno(&Tablero_Jugador, &Tablero_IA, &jugador, &ia);*/
+                        
                     } else {
                         printf("Necesitas al menos una carta en tu tablero para atacar.\n");
                     }
-                    //turno++;
+                    
                     break;
                 default:
                     printf("Opcion no valida.\n");
                     break;
             }
             turno_IA(&Mano_IA, &Tablero_IA, &Tablero_Jugador, &jugador);
+            
             mostrarResumenTurno(&Tablero_Jugador, &Tablero_IA, &jugador, &ia);
+            
+            
 			turno++;		
 		}
 		
 		if(jugador.vida >0 && ia.vida<=0)
 		{
 			printf("\nDuelo Terminado.");
-			printf("\n%s, es el ganador.",jugador.Nombre);
+			printf("El jugador es el ganador.");
 		}
 		
 		if(ia.vida>0 && jugador.vida<=0)
@@ -652,9 +658,8 @@ void juego(struct NodoCarta* listaCartas) {
     	    
 	}
 		
-	}
-	    
-    
+}
+	     
 //*******Verificacion de tipo de carta*********
 bool EsTipoValido(const char* tipo) {
     // Verifica si el tipo de carta es uno de los tipos validos
@@ -728,18 +733,6 @@ void imprimirHistorial(struct Historial historial[], int n) {
     }
 }
 
-//*******Escritura de Historial*******
-void escribirHistorial(struct Historial historial[], int *n, const char* resena) {
-    if (*n < 20) {
-        strcpy(historial[*n].resena, resena);
-        (*n)++;
-    } else {
-        for (int i = 1; i < 20; i++) {
-            strcpy(historial[i - 1].resena, historial[i].resena);
-        }
-        strcpy(historial[19].resena, resena);
-    }
-}
 //*******Funcion main******
 int main() {
     struct NodoCarta *listaCartas = NULL;
@@ -775,7 +768,7 @@ int main() {
                 juego(listaCartas);
                 break;
             case 4:
-                imprimirHistorial(historial, n);
+                printf("historial");
                 break;
             case 5:
                 liberarMemoria(listaCartas); // Liberar la memoria de las cartas al salir del programa
