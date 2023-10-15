@@ -625,6 +625,8 @@ void juego(struct NodoCarta* listaCartas) {
                     break;
                 case 2:
                     if (Tablero_Jugador.tamano > 0) {
+                    	
+                    	atacarConCarta(&Tablero_Jugador, &Tablero_IA, &ia);
                         
                     } else {
                         printf("Necesitas al menos una carta en tu tablero para atacar.\n");
@@ -646,7 +648,7 @@ void juego(struct NodoCarta* listaCartas) {
 		if(jugador.vida >0 && ia.vida<=0)
 		{
 			printf("\nDuelo Terminado.");
-			printf("El jugador es el ganador.");
+			printf("\nEl jugador es el ganador.\n");
 		}
 		
 		if(ia.vida>0 && jugador.vida<=0)
