@@ -221,16 +221,14 @@ void moverCartas(struct Pila* origen, struct Pila* destino, int n) {
     for (int i = 0; i < n; i++) {
         struct NodoCarta* carta = pop(origen);
         if (carta != NULL) {
-            // Verificar si la carta ya está en el mazo de destino
+            
             if (!cartaEnMazo(carta, destino)) {
                 push(destino, carta);
             } else {
-                printf("No se pueden mover cartas duplicadas al mazo.\n");
-                // Liberar memoria de la carta que no se agregó al mazo
                 free(carta);
             }
         } else {
-            printf("No se pueden mover más cartas. La pila de origen está vacía.\n");
+            printf("No se pueden mover mas cartas. La pila de origen esta vacia.\n");
             break;
         }
     }
@@ -534,6 +532,7 @@ void turno_IA(struct Pila* Mano_IA, struct Pila* Tablero_IA, struct Pila* Tabler
         }
     }
 }
+
 
 //***************JUEGO COMPLETO**********************
 void juego(struct NodoCarta* listaCartas) {
