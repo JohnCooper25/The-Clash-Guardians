@@ -51,7 +51,8 @@ Sin duda alguna esta fue la parte mas complicada de este largo proceso.
 ## Material extra
 A continuacion adjuntamos un link de acceso a un video en youtube en el cual se detalla todo lo implementado. Tambien se adjunta un link de acceso a el repositorio de **Github* que contiene todo el material del proyecto:
 
-(https://github.com/JohnCooper25/The-Clash-Guardians/tree/main)
+https://github.com/JohnCooper25/The-Clash-Guardians/tree/main
 
+https://youtu.be/Mo-KK3t0b7Y
 
                       
