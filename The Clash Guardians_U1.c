@@ -228,7 +228,7 @@ void moverCartas(struct Pila* origen, struct Pila* destino, int n) {
                 free(carta);
             }
         } else {
-            printf("No se pueden mover mas cartas. La pila de origen esta vacia.\n");
+            printf("No quedan mas cartas en el mazo.");
             break;
         }
     }
@@ -537,7 +537,7 @@ void turno_IA(struct Pila* Mano_IA, struct Pila* Tablero_IA, struct Pila* Tabler
 //***************JUEGO COMPLETO**********************
 void juego(struct NodoCarta* listaCartas) {
 	
-	// Inicializar la vida de ambos jugadores
+	//inicializacion de variables
     struct Jugador jugador;
     struct IA ia;
     jugador.vida = 5;
@@ -571,7 +571,7 @@ void juego(struct NodoCarta* listaCartas) {
 	            iterador = listaCartas; // Volver al inicio si llegamos al final de la lista
 	        }
 	    }
-	    // Aqui puedes agregar la carta seleccionada a Mazo_Jugador o Mazo_IA, dependiendo de a quien le toque
+	    
 	    if (i < 7) {
 	        push(&Mazo_Jugador, iterador);
 	    } else {
@@ -772,7 +772,7 @@ int main() {
                 printf("historial");
                 break;
             case 5:
-                liberarMemoria(listaCartas); // Liberar la memoria de las cartas al salir del programa
+                liberarMemoria(listaCartas); 
                 printf("Saliendo del juego...\n");
                 break;
             default:

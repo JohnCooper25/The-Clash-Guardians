@@ -8,6 +8,11 @@ GUIA PARA INSTALAR THE CLASH GUARDIANS
 -> luego debe marcar un tic en la parte de abajo que dice "añadir estos comandos a la linea de comandos del linker"
 -> agregar la opcion "-std=c99"-> darle a aceptar.
 (6) Ejecute el programa.
+(7) Antes de comenzar a Jugar debe ingresar su nombre de jugador.
+(8) Luego escogemos la opc '1' carga de informacion.
+(9) Ahora podemos empezar a crear cartas o jugar directamente.
+(10) El juego es simple debe ir seleccionando las opc a medida que van pasando los turnos.
+
+¡Suerte en el juego!
 
 
-El resto de instrucciones para jugar estan en el archivo README.MD disponible en github.
